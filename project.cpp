@@ -1,6 +1,6 @@
 //Created By Dominic Flores
 //Project for 3120
-//Advanced BFS
+//Advanced DFS
 
 #include <iostream>
 using namespace std;
@@ -33,6 +33,8 @@ int main()
 }
 
 //Function Definitions
+
+//Fills adjacency matrix with input from file
 void fillGraph(int num , int graph[][5])
 {
   int input = 0;
@@ -44,6 +46,7 @@ void fillGraph(int num , int graph[][5])
   }
 }
 
+//Prints Adjacency Matrix
 void showGraph(int num , int graph[][5])
 {
   for (int i = 0; i < num; i++) {
@@ -54,13 +57,16 @@ void showGraph(int num , int graph[][5])
   }
 }
 
+//This is the small dfs. It takes in the adjacency matrix, the index of the current node
+//The amount of poison, and the index of the current poison vile
 void drop_poison(int graph[][5] , int current , int current_poison, int poison_index)
 {
-  //Mark Node has been visited in this pass. Clean up in next pass
+  //Mark Node has been visited in this pass. 
   visited[current] = 1;
   cout << "\n\nVisited Node: " << current << endl;
   cout << "Current Poison: " << current_poison << endl;
-  //Kill Ants
+  
+  //Kill Ants. So far sums up the number of ants killed
   if (ant_num[current] - current_poison >= 0) {
     cout << "Ant Amount Before: " << ant_num[current] << endl;
     total_killed += current_poison;
@@ -71,19 +77,25 @@ void drop_poison(int graph[][5] , int current , int current_poison, int poison_i
     total_killed += ant_num[current];
     cout << "Ants Killed " << total_killed << endl;
   }
-  //Used Poison
+  
+  //Update Poison values since we just spent some killing ants
   current_poison = current_poison - ant_num[current];
   if (current_poison < 0) {
     current_poison = 0;
   }
+  //Updates Poison vile value
   poison[poison_index] = current_poison;
-  cout << "Poison in current vile: " << poison[poison_index] << "\n\n";;
+  cout << "Poison left over: " << current_poison << "\n\n";
+  //Ends if we run out of poison
   if (current_poison == 0) {return;}
 
   int connections = 0;
+  //Finds how many neighbors this node has
   connections = check_connections(graph, current);
+  //Splits poison and uses some for traversal
   current_poison = (current_poison/connections) - lost_poison;
 
+  //This loop is the basic dfs. It allows the poison to spread evenly
   for (int i = 0; i < hill_num; i++) {
     if (graph[current][i] == 1) {
       drop_poison(graph, i, current_poison, poison_index);
@@ -93,6 +105,7 @@ void drop_poison(int graph[][5] , int current , int current_poison, int poison_i
   return;
 }
 
+//Returns number of neighbors
 int check_connections(int graph[][5] , int current)
 {
   int adjacent = 0;
