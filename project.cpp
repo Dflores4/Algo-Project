@@ -8,8 +8,9 @@ using namespace std;
 //Global Variables
 const int hill_num = 5;
 const int lost_poison = 5;
-int poison[3] = {100 , 100 , 100};
-int ant_num[hill_num] = {40 , 80 , 30 , 60 , 30};
+int poison[3] = {500 , 100 , 100};
+int ant_num[hill_num] = {40 , 80 , 30 , 30 , 60};
+int ant_num_copy[hill_num] = {40 , 80 , 30 , 30 , 60};
 int global_visited[hill_num] = {0 , 0 , 0 , 0 , 0};
 int visited[hill_num] = {0 , 0 , 0 , 0 , 0};
 int flag = 0;
@@ -69,17 +70,26 @@ void drop_poison(int graph[][5] , int current , int current_poison, int poison_i
   //Kill Ants. So far sums up the number of ants killed
   if (ant_num[current] - current_poison >= 0) {
     cout << "Ant Amount Before: " << ant_num[current] << endl;
-    total_killed += current_poison;
+    //Update Ant Number
+    int place_holder = ant_num[current];
+    ant_num[current] = ant_num[current] - current_poison;
+    //Update Poison
+    current_poison = current_poison - place_holder;
+    cout << "Ant Amount After: " << ant_num[current] << endl;
+    total_killed += place_holder - ant_num[current];
     cout << "Ants Killed " << total_killed << endl;
   }
   else {
     cout << "Ant Amount Before: " << ant_num[current] << endl;
     total_killed += ant_num[current];
+    //Update Poison
+    current_poison = current_poison - ant_num[current];
+    //Update Ant Number
+    ant_num[current] = 0;
+    cout << "Ant Amount After: " << ant_num[current] << endl;
     cout << "Ants Killed " << total_killed << endl;
   }
-  
-  //Update Poison values since we just spent some killing ants
-  current_poison = current_poison - ant_num[current];
+  //Used to set poison to 0 if negative
   if (current_poison < 0) {
     current_poison = 0;
   }
@@ -87,7 +97,7 @@ void drop_poison(int graph[][5] , int current , int current_poison, int poison_i
   poison[poison_index] = current_poison;
   cout << "Poison left over: " << current_poison << "\n\n";
   //Ends if we run out of poison
-  if (current_poison == 0) {return;}
+  if (current_poison <= 15) {return;}
 
   int connections = 0;
   //Finds how many neighbors this node has
@@ -97,8 +107,9 @@ void drop_poison(int graph[][5] , int current , int current_poison, int poison_i
 
   //This loop is the basic dfs. It allows the poison to spread evenly
   for (int i = 0; i < hill_num; i++) {
-    if (graph[current][i] == 1) {
+    if (graph[current][i] == 1 && visited[i] == 0) {
       drop_poison(graph, i, current_poison, poison_index);
+      visited[i] = 0;
     }
   }
 
