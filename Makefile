@@ -2,7 +2,7 @@
 all: clean  project
 
 project: project.cpp
-	g++ project.cpp -Wall -o run
+	g++ project.cpp -Wall -o project
 
 clean: 
-	rm -f run
+	rm -f project
